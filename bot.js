@@ -105,7 +105,7 @@ const commands = [
     ],
   },
   {
-    name: "add",
+    name: "sum",
     description: "Sum numbers.",
     options: [
       {
@@ -152,7 +152,6 @@ async function putCommands(Guilds) {
         body: commands,
       });
       console.log(`${guild.name} (id: ${guild.id})`);
-      console.log(guild);
     });
     console.log("Successfully reloaded application (/) commands.");
   } catch (error) {
@@ -168,22 +167,27 @@ client.on("ready", () => {
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) return;
-  const { commandName, options, channel_id } = interaction;
+  const { commandName, options } = interaction;
 
   const opts = options._hoistedOptions;
-  const args_c = opts.length;
-  if (commandName === "add") {
+  const args_quantity = opts.length;
+  if (commandName === "sum") {
+    let numbers = [];
     let sum = 0;
-    for (let i = 1; i < args_c + 1; i++) {
-      sum += options.getNumber(`num${i}`);
+    for (let i = 1; i < 7; i++) {
+      let n = options.getNumber(`num${i}`);
+      if (n != null) {
+        numbers.push(n);
+        sum += n;
+      }
     }
 
+    const answerString = `The sum of ${numbers.join(" ")} is ${sum}`;
     await interaction.reply({
-      content: `Sum is: ${sum}`,
-      ephemeral: true,
+      content: answerString,
     });
   } else if (commandName === "time") {
-    await interaction.reply(`13:37:00`);
+    await interaction.reply(`00:13:37`);
   } else if (commandName === "embed") {
     const answer = new MessageEmbed()
       .setColor("#0099ff")
@@ -201,13 +205,11 @@ client.on("interactionCreate", async (interaction) => {
     const choice = Math.floor(Math.random() * (max - min + 1) + min);
     if (max < min) {
       await interaction.reply({
-        content: "Invalid arguments.",
-        // ephemeral: true,
+        content: "Invalid arguments. min >= max",
       });
     } else {
       await interaction.reply({
-        content: `From ${min} to ${max}\nNumber is... ${choice}`,
-        // ephemeral: true,
+        content: `In range (${min}, ${max})\nChosen ${choice}`,
       });
     }
   } else if (commandName === "random") {
@@ -217,7 +219,7 @@ client.on("interactionCreate", async (interaction) => {
     });
   } else if (commandName === "roll") {
     const hide = options.getBoolean("hide");
-    const valids = Array.from(Array(8).keys()).map((e, i) => {
+    const valids = Array.from(Array(8).keys()).map((_, i) => {
       return `arg${i + 1}`;
     });
     const choices = valids.reduce((prev, cur) => {
@@ -236,13 +238,13 @@ client.on("interactionCreate", async (interaction) => {
       );
     try {
       const choice = opts[arg_c].value;
-      const answer = {
-        content: `${msg}\nChoice is ${choice}`,
-        // ephemeral: true,
-      };
+      let answerContent = `${msg}\nFrom ${choices.join(" ")}\nChosen ${choice}`;
       if (hide != null && hide === false) {
         answer.embeds = [ans_embed];
       }
+      const answer = {
+        content: answerContent,
+      };
       await interaction.reply(answer);
     } catch (e) {
       console.log(`Error: ${e}`);
