@@ -23,6 +23,44 @@ const commands = [
   {
     name: "embed",
     description: "Test embedded.",
+    options: [
+      {
+        name: "author",
+        description: "Set author.",
+        required: true,
+        type: DiscordJS.Constants.ApplicationCommandOptionTypes.STRING,
+      },
+      {
+        name: "title",
+        description: "Set title.",
+        required: true,
+        type: DiscordJS.Constants.ApplicationCommandOptionTypes.STRING,
+      },
+      {
+        name: "description",
+        description: "Set description.",
+        required: true,
+        type: DiscordJS.Constants.ApplicationCommandOptionTypes.STRING,
+      },
+      {
+        name: "footer",
+        description: "Set footer.",
+        required: false,
+        type: DiscordJS.Constants.ApplicationCommandOptionTypes.STRING,
+      },
+      {
+        name: "thumbnail",
+        description: "Set thumbnail link.",
+        required: false,
+        type: DiscordJS.Constants.ApplicationCommandOptionTypes.STRING,
+      },
+      {
+        name: "color",
+        description: "Set color.",
+        required: false,
+        type: DiscordJS.Constants.ApplicationCommandOptionTypes.STRING,
+      },
+    ],
   },
   {
     name: "randint",
@@ -189,13 +227,27 @@ client.on("interactionCreate", async (interaction) => {
   } else if (commandName === "time") {
     await interaction.reply(`00:13:37`);
   } else if (commandName === "embed") {
-    const answer = new MessageEmbed()
-      .setColor("#0099ff")
-      .setTitle("Some title")
-      .setAuthor("Name of author")
-      .setDescription("Description")
-      .setThumbnail("https://i.imgur.com/AfFp7pu.png")
-      .setFooter("Some footer");
+    const Author = options.getString("author", true);
+    const Title = options.getString("title", true);
+    const Description = options.getString("description", true);
+    let Footer = options.getString("footer", false);
+    let Color = options.getString("color", false) ?? "b00baa";
+    let Thumbnail =
+      options.getString("thumbnail", false) ??
+      "https://i.imgur.com/AfFp7pu.png";
+    let answer = new MessageEmbed()
+      .setTitle(Title)
+      .setAuthor(Author)
+      .setDescription(Description);
+    if (Color != null) {
+      answer.setColor(Color);
+    }
+    if (Thumbnail != null) {
+      answer.setThumbnail(Thumbnail);
+    }
+    if (Footer != null) {
+      answer.setFooter(Footer);
+    }
     interaction.reply({
       embeds: [answer],
     });
