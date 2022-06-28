@@ -1,6 +1,5 @@
 const { Client, Intents, MessageEmbed } = require("discord.js");
 const client = new Client({ intents: ["GUILDS"] });
-const DiscordJS = require("discord.js");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 require("dotenv").config();
@@ -8,6 +7,9 @@ require("dotenv").config();
 const token = process.env["token"];
 const CLIENT_ID = process.env["client_id"];
 const rest = new REST({ version: "9" }).setToken(token);
+
+const DiscordJS = require("discord.js");
+
 const commands = [
   /*
          * Template
@@ -16,10 +18,6 @@ const commands = [
           description: '',
         },
          */
-  {
-    name: "time",
-    description: "Print current h:m:s.",
-  },
   {
     name: "embed",
     description: "Test embedded.",
@@ -181,7 +179,6 @@ const commands = [
     ],
   },
 ];
-
 async function putCommands(Guilds) {
   try {
     console.log("Started refreshing application (/) commands.");
@@ -208,7 +205,6 @@ client.on("interactionCreate", async (interaction) => {
   const { commandName, options } = interaction;
 
   const opts = options._hoistedOptions;
-  const args_quantity = opts.length;
   if (commandName === "sum") {
     let numbers = [];
     let sum = 0;
@@ -219,22 +215,17 @@ client.on("interactionCreate", async (interaction) => {
         sum += n;
       }
     }
-
     const answerString = `The sum of ${numbers.join(" ")} is ${sum}`;
     await interaction.reply({
       content: answerString,
     });
-  } else if (commandName === "time") {
-    await interaction.reply(`00:13:37`);
   } else if (commandName === "embed") {
     const Author = options.getString("author", true);
     const Title = options.getString("title", true);
     const Description = options.getString("description", true);
     let Footer = options.getString("footer", false);
-    let Color = options.getString("color", false) ?? "b00baa";
-    let Thumbnail =
-      options.getString("thumbnail", false) ??
-      "https://i.imgur.com/AfFp7pu.png";
+    let Color = options.getString("color", false); // ?? "b00baa";
+    let Thumbnail = options.getString("thumbnail", false); // ?? "https://i.imgur.com/AfFp7pu.png";
     let answer = new MessageEmbed()
       .setTitle(Title)
       .setAuthor(Author)
